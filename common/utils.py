@@ -67,6 +67,10 @@ class BaseCls(object):
         self.cookies = cookies
 
     @cached_property
+    def access_key(self):
+        return os.getenv("BILIBILI_ACCESS_KEY")
+
+    @cached_property
     def logger(self):
         if self.__cache.get("logger"):
             logger = self.__cache['logger']
@@ -111,7 +115,8 @@ class BaseCls(object):
             params = appsign(params, sign_appkey, sign_appsec)
         return Response(self.requests.get(params=params, **kwargs))
 
-    def post(self, *, csrf=None, json=None, headers=None, data=None, **kwargs) -> Response:
+    def post(self, *, sign_appkey=None, sign_appsec=None, csrf=None, json=None, headers=None, data=None,
+             **kwargs) -> Response:
         if csrf:
             headers = headers or {}
             if isinstance(csrf, bool):
@@ -126,6 +131,11 @@ class BaseCls(object):
                     json['csrf'] = csrf
                 elif data:
                     data['csrf'] = csrf
+        if sign_appkey:
+            if data:
+                data = appsign(data, sign_appkey, sign_appsec)
+            elif json:
+                json = appsign(json, sign_appkey, sign_appsec)
         return Response(self.requests.post(json=json, data=data, headers=headers, **kwargs))
 
     @property
@@ -149,5 +159,6 @@ class BaseCls(object):
         for i in cookies_list:
             cookies = {k.strip(): v.strip() for k, v in (__i.split("=") for __i in (_i for _i in i.split(";")))}
             instance = cls(cookies)
+            print(instance.access_key)
             instance.logger.info(f"用户昵称:{instance.user_info['uname']}")
             instance.run()
