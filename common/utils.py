@@ -28,7 +28,7 @@ appkey_table = {
 }
 
 
-def appsign(params, appkey, appsec=None):
+def appsign(params, appkey=default_appkey, appsec=None):
     '为请求参数进行 api 签名'
     if appsec is None:
         appsec = appkey_table[appkey]
