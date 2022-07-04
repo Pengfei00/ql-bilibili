@@ -22,8 +22,8 @@ class VipPrivilege(BaseCls):
 
     def receive(self, _type):
         url = "https://api.bilibili.com/x/vip/privilege/receive"
-        body = {"type": _type, "csrf": self.csrf}
-        resp = self.post(url=url, json=body)
+        body = {"type": _type}
+        resp = self.post(url=url, data=body, csrf=True)
         return resp
 
     def run(self):
